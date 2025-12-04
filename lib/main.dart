@@ -1,124 +1,200 @@
 import 'package:flutter/material.dart';
-import 'ListView/ListView.builder and drawer.dart';
-import 'ListView/ListView.dart';
-import 'SingleChild.dart';
-import 'bottombar/Indexpage.dart';
-import 'cv.dart';
-import 'textfild.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
+      title: 'Takleef Task4',
       theme: ThemeData(
-        primarySwatch: Colors.yellow,
-        fontFamily: 'Amiri',
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        useMaterial3: true,
       ),
-      builder: (context, child) {
-        return Directionality(
-          textDirection: TextDirection.rtl,
-          child: child!,
-        );
-      },
-      home: const FirstPage(),
+      home: const MainScreen(),
     );
   }
 }
 
-class FirstPage extends StatelessWidget {
-  const FirstPage({super.key});
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
+
+  @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  int _currentIndex = 0;
+
+  final List<Widget> _pages = const [
+    HomePage(),
+    SearchPage(),
+    SettingsPage(),
+    AccountPage(),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Main Menu'),
-        backgroundColor: Colors.blueGrey,
-      ),
-      body: Center(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildNavigationButton(
-                  context,
-                  'Single Child',
-                  const Color.fromARGB(255, 158, 169, 168),
-                  Icons.child_care,
-                  SingleChild()),
-              _buildNavigationButton(
-                  context,
-                  'CV',
-                  const Color.fromARGB(255, 63, 54, 244),
-                  Icons.picture_as_pdf,
-                  CV()),
-              _buildNavigationButton(
-                  context,
-                  'List',
-                  const Color.fromARGB(255, 162, 23, 134),
-                  Icons.list,
-                  Listview()),
-              _buildNavigationButton(context, 'ListView Builder', Colors.orange,
-                  Icons.view_list, Listviewbuilder()),
-              _buildNavigationButton(
-                  context,
-                  'Text Field',
-                  const Color.fromARGB(255, 158, 172, 183),
-                  Icons.text_fields,
-                  Textfild()),
-              _buildNavigationButton(
-                  context,
-                  'Bottom Nav',
-                  const Color.fromARGB(255, 185, 22, 41),
-                  Icons.navigation,
-                  Indexpage()),
-            ],
+      appBar: AppBar(title: const Text('Takleef Four')),
+      body: _pages[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (i) => setState(() => _currentIndex = i),
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
           ),
-        ),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
+        ],
+        type: BottomNavigationBarType.fixed,
       ),
     );
   }
+}
 
-  Widget _buildNavigationButton(BuildContext context, String title, Color color,
-      IconData icon, Widget page) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-      elevation: 5,
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => page),
-          );
-        },
-        child: Container(
-          padding: EdgeInsets.symmetric(vertical: 20),
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(10),
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final TextEditingController _firstController = TextEditingController();
+  final TextEditingController _secondController = TextEditingController();
+
+  @override
+  void dispose() {
+    _firstController.dispose();
+    _secondController.dispose();
+    super.dispose();
+  }
+
+  void _copyText() {
+    setState(() {
+      _secondController.text = _firstController.text;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Copied: "${_firstController.text}"')),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text(
+            'Home',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Icon(icon, color: Colors.white, size: 30),
-              Text(
-                title,
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold),
-              ),
-            ],
+          const SizedBox(height: 12),
+          TextField(
+            controller: _firstController,
+            decoration: const InputDecoration(
+              labelText: 'First field',
+              border: OutlineInputBorder(),
+            ),
           ),
+          const SizedBox(height: 12),
+          ElevatedButton(
+            onPressed: _copyText,
+            child: const Text('Copy to second field'),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _secondController,
+            decoration: const InputDecoration(
+              labelText: 'Second field',
+              border: OutlineInputBorder(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class SearchPage extends StatelessWidget {
+  const SearchPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final items = List<String>.generate(20, (i) => 'Item ${i + 1}');
+    return ListView.builder(
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        return ListTile(
+          leading: const Icon(Icons.list),
+          title: Text(items[index]),
+          subtitle: Text('Subtitle for ${items[index]}'),
+          onTap: () {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text('Tapped ${items[index]}')));
+          },
+        );
+      },
+    );
+  }
+}
+
+class SettingsPage extends StatelessWidget {
+  const SettingsPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: const [
+        Text(
+          'Settings',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
+        SizedBox(height: 12),
+        SwitchListTile(
+          value: true,
+          onChanged: null,
+          title: Text('Enable notifications'),
+        ),
+        ListTile(
+          leading: Icon(Icons.color_lens),
+          title: Text('Theme'),
+          subtitle: Text('Light'),
+        ),
+      ],
+    );
+  }
+}
+
+class AccountPage extends StatelessWidget {
+  const AccountPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: const [
+          CircleAvatar(radius: 36, child: Icon(Icons.person, size: 36)),
+          SizedBox(height: 12),
+          Text(
+            'User Name',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          ),
+          SizedBox(height: 6),
+          Text('user@example.com'),
+        ],
       ),
     );
   }
